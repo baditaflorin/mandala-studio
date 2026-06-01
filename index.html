@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>mandala-studio — symmetry drawing canvas</title>
+    <meta
+      name="description"
+      content="A radial-symmetry drawing canvas. Draw once and it blooms into a mandala. Print or export SVG/PNG. No backend, nothing leaves your device."
+    />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <main class="stage">
+      <canvas id="canvas" aria-label="Mandala drawing canvas"></canvas>
+    </main>
+
+    <aside class="panel" id="panel">
+      <header class="panel-head">
+        <h1>mandala</h1>
+        <button type="button" id="toggle-panel" class="ghost" aria-label="Hide controls">×</button>
+      </header>
+
+      <p class="hint">Draw on the canvas — your stroke blooms into a mandala.</p>
+
+      <label class="row">
+        <span>Segments <output id="segments-out"></output></span>
+        <input type="range" id="segments" min="3" max="24" step="1" />
+      </label>
+
+      <label class="row checkbox">
+        <input type="checkbox" id="mirror" />
+        <span>Mirror each slice</span>
+      </label>
+
+      <label class="row checkbox">
+        <input type="checkbox" id="guides" />
+        <span>Center guide lines</span>
+      </label>
+
+      <label class="row">
+        <span>Brush color</span>
+        <input type="color" id="brushColor" />
+      </label>
+
+      <div class="swatches" id="swatches"></div>
+
+      <label class="row">
+        <span>Brush size <output id="brushSize-out"></output></span>
+        <input type="range" id="brushSize" min="1" max="40" step="1" />
+      </label>
+
+      <label class="row">
+        <span>Background</span>
+        <input type="color" id="bgColor" />
+      </label>
+
+      <div class="buttons">
+        <button type="button" id="undo">↩ Undo</button>
+        <button type="button" id="clear">🗑 Clear</button>
+      </div>
+      <div class="buttons">
+        <button type="button" id="png">⬇ PNG</button>
+        <button type="button" id="svg">⬇ SVG</button>
+      </div>
+
+      <footer class="self-ref">
+        <a
+          id="source"
+          href="https://github.com/baditaflorin/mandala-studio"
+          target="_blank"
+          rel="noopener"
+          >source</a
+        >
+        ·
+        <a href="https://www.paypal.com/paypalme/florinbadita" target="_blank" rel="noopener"
+          >tip ♥</a
+        >
+        · <span id="version">vdev</span>
+      </footer>
+    </aside>
+
+    <button type="button" id="show-panel" class="show-panel" aria-label="Show controls">⚙</button>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
