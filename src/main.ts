@@ -3,6 +3,7 @@ import {
   expandStroke,
   SEGMENTS_MAX,
   SEGMENTS_MIN,
+  translateStroke,
   type Point,
   type Stroke,
 } from "./symmetry";
@@ -46,6 +47,11 @@ const state = {
 let strokes: Stroke[] = [];
 let current: Stroke | null = null;
 let dpr = Math.min(2, window.devicePixelRatio || 1);
+// The center used the last time the canvas was sized. Strokes are stored in
+// absolute canvas-pixel coordinates, so whenever the canvas is resized and the
+// center moves, already-drawn strokes must be translated by the same delta or
+// they visibly drift off-center on the next redraw (see translateStroke).
+let lastCenter: Point | null = null;
 
 function cssSize(): { w: number; h: number } {
   const stage = canvas.parentElement!;
@@ -66,6 +72,20 @@ function resizeCanvas(): void {
   canvas.style.width = `${w}px`;
   canvas.style.height = `${h}px`;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  // Re-anchor existing strokes to the new center so a resize (window resize,
+  // orientation change, DevTools toggling, ...) can't drag already-drawn
+  // artwork off to one side. See translateStroke's doc comment.
+  const newCenter = { x: w / 2, y: h / 2 };
+  if (lastCenter) {
+    const dx = newCenter.x - lastCenter.x;
+    const dy = newCenter.y - lastCenter.y;
+    if (dx !== 0 || dy !== 0) {
+      strokes = strokes.map((s) => translateStroke(s, dx, dy));
+      if (current) current = translateStroke(current, dx, dy);
+    }
+  }
+  lastCenter = newCenter;
 }
 
 function drawStroke(stroke: Stroke, c: Point): void {
