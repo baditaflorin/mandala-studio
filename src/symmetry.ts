@@ -79,3 +79,24 @@ export function expandStroke(
   const transforms = symmetryTransforms(segments, mirror);
   return transforms.map((t) => points.map((p) => applyTransform(p, t, center)));
 }
+
+/**
+ * Shift every point of a stroke by (dx, dy), returning a new stroke (input is
+ * not mutated).
+ *
+ * Strokes are captured in absolute canvas-pixel coordinates, not as offsets
+ * from the mandala center. If the canvas is later resized (window resize,
+ * orientation change, DevTools opening/closing, ...) the center moves but
+ * already-drawn strokes don't — so redrawing them against the *new* center
+ * would visibly drag the whole symmetric bloom off to one side instead of
+ * keeping it centered. Callers should compute the old and new center and
+ * translate every existing stroke by the difference so already-drawn artwork
+ * stays anchored to the (possibly relocated) center across a resize.
+ */
+export function translateStroke(stroke: Stroke, dx: number, dy: number): Stroke {
+  if (dx === 0 && dy === 0) return stroke;
+  return {
+    ...stroke,
+    points: stroke.points.map((p) => ({ x: p.x + dx, y: p.y + dy })),
+  };
+}

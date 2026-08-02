@@ -13,7 +13,7 @@
     "vitest": "4.1.0"
   },
   "engines": {
-    "node": "\u003e=22"
+    "node": ">=22"
   },
   "homepage": "https://baditaflorin.github.io/mandala-studio/",
   "license": "MIT",

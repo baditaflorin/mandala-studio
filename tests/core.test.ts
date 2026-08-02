@@ -4,6 +4,7 @@ import {
   clamp,
   expandStroke,
   symmetryTransforms,
+  translateStroke,
   type Point,
 } from "../src/symmetry";
 import { strokesToSvg, strokeToSvgElements, type SvgOpts } from "../src/svg";
@@ -114,6 +115,60 @@ describe("expandStroke", () => {
   it("returns nothing for an empty stroke", () => {
     expect(expandStroke([], 12, true, C)).toHaveLength(0);
   });
+});
+
+describe("translateStroke", () => {
+  const stroke = {
+    color: "#4cc9f0",
+    size: 5,
+    points: [
+      { x: 10, y: 20 },
+      { x: 30, y: 40 },
+    ],
+  };
+
+  it("shifts every point by (dx, dy)", () => {
+    const shifted = translateStroke(stroke, 100, -50);
+    expect(shifted.points).toEqual([
+      { x: 110, y: -30 },
+      { x: 130, y: -10 },
+    ]);
+  });
+
+  it("preserves color and size", () => {
+    const shifted = translateStroke(stroke, 5, 5);
+    expect(shifted.color).toBe(stroke.color);
+    expect(shifted.size).toBe(stroke.size);
+  });
+
+  it("does not mutate the input stroke", () => {
+    const original = JSON.parse(JSON.stringify(stroke));
+    translateStroke(stroke, 7, 7);
+    expect(stroke).toEqual(original);
+  });
+
+  it("is a no-op for a zero delta", () => {
+    expect(translateStroke(stroke, 0, 0)).toBe(stroke);
+  });
+
+  it(
+    "re-anchors a stroke to a new center: translating by (newCenter - " +
+      "oldCenter) keeps the point at the same offset from center",
+    () => {
+      const oldCenter = { x: 100, y: 100 };
+      const newCenter = { x: 250, y: 80 };
+      const dx = newCenter.x - oldCenter.x;
+      const dy = newCenter.y - oldCenter.y;
+      const p: Point = { x: 130, y: 90 }; // offset (30, -10) from oldCenter
+      const shifted = translateStroke({ ...stroke, points: [p] }, dx, dy);
+      const newOffset = {
+        x: shifted.points[0]!.x - newCenter.x,
+        y: shifted.points[0]!.y - newCenter.y,
+      };
+      expect(newOffset.x).toBeCloseTo(p.x - oldCenter.x);
+      expect(newOffset.y).toBeCloseTo(p.y - oldCenter.y);
+    },
+  );
 });
 
 describe("svg export", () => {
